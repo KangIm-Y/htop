@@ -33,8 +33,8 @@ in the source distribution for its full text.
 #if defined(MAJOR_IN_MKDEV)
 #include <sys/mkdev.h>
 #endif
-extern int meml; // memlimit 전역변수
-extern int cpul; // cpulimit 전역변수
+extern int meml; // memlimit Global variable from htop.c
+extern int cpul; // cpulimit Gloval variable from htop.c
 
 /* Used to identify kernel threads in Comm and Exe columns */
 static const char *const kthreadID = "KTHREAD";
@@ -1079,7 +1079,7 @@ void Process_writeField(const Process *this, RichString *str, ProcessField field
       if (this->percent_cpu > cpul)
       {
          FILE *pFile = fopen("ResultOfCpu.txt", "a");
-         fprintf(pFile, "%d년 %d월 %d일 %d시 %d분 %d초 PID %d의 CPU 점유율 %f", nowTime(0), nowTime(1), nowTime(2), nowTime(3), nowTime(4), nowTime(5), this->pid, this->percent_cpu);
+         fprintf(pFile, "%d-%d-%d   %d:%d:%d: PID %d's perent %f %%", nowTime(0), nowTime(1), nowTime(2), nowTime(3), nowTime(4), nowTime(5), this->pid, this->percent_cpu);
          fprintf(pFile, "\n");
          fclose(pFile);
          char value[100];
@@ -1087,7 +1087,7 @@ void Process_writeField(const Process *this, RichString *str, ProcessField field
          char value3[100];
          char result[100] = "echo \"PID";
          char printend[50] = "\" > /dev/pts/";
-         system("ls /dev/pts | wc -l > shellcounter.txt"); // 열린 shell  개수
+         system("ls /dev/pts | wc -l > shellcounter.txt"); // opened terminal count
          FILE *shellc;
          char buf[1024];
          int shellcounter = 0;
@@ -1096,10 +1096,10 @@ void Process_writeField(const Process *this, RichString *str, ProcessField field
          shellcounter = atoi(buf);
          shellcounter = shellcounter - 2;
          fclose(shellc);
-         // 출력문
+         //shell command
          sprintf(value, "%d", this->pid);
          strcat(result, value);
-         strcat(result, "의 CPU 점유율");
+         strcat(result, "'s CPU percent");
          sprintf(value2, "%f", this->percent_cpu);
          strcat(result, value2);
          strcat(result, printend);
@@ -1119,10 +1119,10 @@ void Process_writeField(const Process *this, RichString *str, ProcessField field
       if (this->percent_mem > meml)
       {
          FILE *pFile = fopen("ResultOfMemory.txt", "a");
-         fprintf(pFile, "%d년 %d월 %d일 %d시 %d분 %d초 PID %d의 메모리 점유율 %f", nowTime(0), nowTime(1), nowTime(2), nowTime(3), nowTime(4), nowTime(5), this->pid, this->percent_mem);
+         fprintf(pFile, "%d-%d-%d  %d:%d:%d PID %d's Memory percent %f %%", nowTime(0), nowTime(1), nowTime(2), nowTime(3), nowTime(4), nowTime(5), this->pid, this->percent_mem);
          fprintf(pFile, "\n");
          fclose(pFile);
-         system("ls /dev/pts | wc -l > shellcounter.txt"); // 열린 shell  개수
+         system("ls /dev/pts | wc -l > shellcounter.txt");
          char value[100];
          char value2[100];
          char value3[100];
@@ -1137,11 +1137,9 @@ void Process_writeField(const Process *this, RichString *str, ProcessField field
          shellcounter = shellcounter - 2;
          fclose(shellc);
 
-         // 출력문
-
          sprintf(value, "%d", this->pid);
          strcat(result, value);
-         strcat(result, "의 메모리 점유율");
+         strcat(result, "'s Memory percent");
          sprintf(value2, "%f", this->percent_mem);
          strcat(result, value2);
          strcat(result, printend);
